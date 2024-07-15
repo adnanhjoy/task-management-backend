@@ -18,6 +18,27 @@ const getAllTeamMembers = async (req, res) => {
 }
 
 
+const getSingleTeamMember = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const member = await pool.query(
+            "SELECT * FROM teammembers WHERE id=$1",
+            [id]
+        )
+
+        res.status(200).json({
+            message: 'Success',
+            data: member.rows
+        })
+    } catch (error) {
+        res.status(500).json({
+            error: "There was a server side error!",
+        });
+    }
+}
+
+
 //post team member
 const addTeamMembers = async (req, res) => {
     try {
@@ -89,6 +110,7 @@ const updateTeamMembers = async (req, res) => {
 
 module.exports = {
     getAllTeamMembers,
+    getSingleTeamMember,
     addTeamMembers,
     deleteTeamMembers,
     updateTeamMembers
