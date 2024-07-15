@@ -1,5 +1,7 @@
 const pool = require("../../../config/db");
 const { v4: uuidv4 } = require('uuid');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 //get all team members
 const getAllTeamMembers = async (req, res) => {
@@ -44,13 +46,25 @@ const addTeamMembers = async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
         const id = uuidv4();
+
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         const newMembers = await pool.query(
             "INSERT INTO teammembers (id, name, email, password, role) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-            [id, name, email, password, role]
+            [id, name, email, hashedPassword, role]
+        );
+
+        // Generate JWT token
+        const token = jwt.sign(
+            { id: id, email: email, role: role },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
         );
 
         res.status(200).json({
-            data: newMembers.rows
+            data: newMembers.rows,
+            token: token
         });
     } catch (error) {
         console.error("Error occurred:", error);
@@ -59,6 +73,7 @@ const addTeamMembers = async (req, res) => {
         });
     }
 };
+
 
 
 //delete team member
@@ -108,10 +123,47 @@ const updateTeamMembers = async (req, res) => {
 }
 
 
+
+const loginMembers = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        const user = await pool.query(
+            "SELECT * FROM teammembers WHERE email = $1",
+            [email]
+        );
+
+        if (user.rows.length === 0) {
+            return res.status(400).json({ error: "User not found" });
+        }
+
+        const validPassword = await bcrypt.compare(password, user.rows[0].password);
+
+        if (!validPassword) {
+            return res.status(400).json({ error: "Invalid password" });
+        }
+
+        // Generate JWT token
+        const token = jwt.sign(
+            { id: user.rows[0].id, email: user.rows[0].email, role: user.rows[0].role },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        res.status(200).json({ token: token });
+    } catch (error) {
+        console.error("Error occurred:", error);
+        res.status(500).json({ error: "There was a server side error!" });
+    }
+};
+
+
+
 module.exports = {
     getAllTeamMembers,
     getSingleTeamMember,
     addTeamMembers,
     deleteTeamMembers,
-    updateTeamMembers
+    updateTeamMembers,
+    loginMembers
 }
