@@ -89,22 +89,22 @@ const deleteTeamMembers = async (req, res) => {
 // update team members 
 
 const updateTeamMembers = async (req, res) => {
-    // try {
-    //     const {id} = req.params;
-    //     const { name, email, password, role } = req.body;
-    //     const newMembers = await pool.query(
-    //         "INSERT INTO teammembers (id, name, email, password, role) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-    //         [id, name, email, password, role]
-    //     );
+    try {
+        const { id } = req.params;
+        const { name, email, password, role } = req.body;
+        const newMembers = await pool.query(
+            "UPDATE teammembers SET name = $2, email = $3, password = $4, role = $5 WHERE id = $1 RETURNING *",
+            [id, name, email, password, role]
+        );
 
-    //     res.status(200).json({
-    //         data: newMembers.rows
-    //     });
-    // } catch (error) {
-    //     res.status(500).json({
-    //         error: "There was a server side error"
-    //     })
-    // }
+        res.status(200).json({
+            data: newMembers.rows
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: "There was a server side error"
+        })
+    }
 }
 
 

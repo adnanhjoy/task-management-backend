@@ -8,5 +8,6 @@ router.get('/', teamMemberController.getAllTeamMembers);
 router.get('/:id', teamMemberController.getSingleTeamMember);
 router.post('/', teamMemberController.addTeamMembers);
 router.delete('/:id', teamMemberController.deleteTeamMembers);
+router.put('/:id', teamMemberController.updateTeamMembers);
 
 module.exports = { teamMemberRouter } = router
