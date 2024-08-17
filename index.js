@@ -1,5 +1,6 @@
 const express = require('express');
 const router = require('./src/routes');
+const fs = require("fs");
 require('dotenv').config()
 const app = express();
 const PORT = process.env.PORT;
@@ -11,7 +12,14 @@ app.use(express.json());
 app.use('/v1', router)
 
 app.get('/', async (req, res) => {
-    res.send('Server is runnig')
+    fs.readFile('./src/pages/index.html', (err, data) => {
+        if (err) {
+            console.log(err)
+        } else {
+            res.write(data);
+            res.end()
+        }
+    })
 })
 
 app.listen(PORT, () => {
