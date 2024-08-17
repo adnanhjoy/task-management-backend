@@ -81,7 +81,6 @@ const addTeamMembers = async (req, res) => {
 const deleteTeamMembers = async (req, res) => {
     try {
         const { id } = req.params;
-        console.log(id)
         const deleteMembers = await pool.query(
             'DELETE FROM teammembers WHERE id = $1 RETURNING *',
             [id]
@@ -150,7 +149,7 @@ const loginMembers = async (req, res) => {
             { expiresIn: '1h' }
         );
 
-        res.status(200).json({ token: token });
+        res.status(200).json({ access_token: token, data: user.rows[0] });
     } catch (error) {
         console.error("Error occurred:", error);
         res.status(500).json({ error: "There was a server side error!" });
