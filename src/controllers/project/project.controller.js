@@ -15,6 +15,7 @@ const createProject = async (req, res) => {
             message: "Success"
         });
     } catch (error) {
+        console.error(error)
         res.status(500).json({
             error: "There was a server side error"
         });
@@ -22,6 +23,52 @@ const createProject = async (req, res) => {
 };
 
 
+
+//get all project
+const getAllProject = async (req, res) => {
+    try {
+        const allProjects = await pool.query(
+            "SELECT * FROM project"
+        )
+
+        res.status(200).json({
+            data: allProjects.rows,
+            message: "Success"
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            error: "There was a server side error"
+        })
+    }
+}
+
+
+
+//delete project
+const deleteProjet = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deleteProject = await pool.query(
+            'DELETE FROM project WHERE id = $1 RETURNING *',
+            [id]
+        );
+
+        res.status(200).json({
+            message: 'Successfully deleted',
+            data: deleteProject.rows
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: "There was a server side error"
+        })
+    }
+}
+
+
+
 module.exports = {
-    createProject
+    createProject,
+    getAllProject,
+    deleteProjet
 }
