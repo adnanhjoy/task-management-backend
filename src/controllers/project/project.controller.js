@@ -66,9 +66,32 @@ const deleteProjet = async (req, res) => {
 }
 
 
+// update project
+
+const updateProjects = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const {  name, color, status, teammembers } = req.body;
+        const updateProject = await pool.query(
+            "UPDATE project SET name = $2, color = $3, status = $4, teammembers = $5 WHERE id = $1 RETURNING *",
+            [id,  name, color, status, teammembers]
+        );
+
+        res.status(200).json({
+            data: updateProject.rows
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: "There was a server side error"
+        })
+    }
+}
+
+
 
 module.exports = {
     createProject,
     getAllProject,
-    deleteProjet
+    deleteProjet,
+    updateProjects
 }
