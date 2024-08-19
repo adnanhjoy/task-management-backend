@@ -1,4 +1,5 @@
 const teamMember = require("../controllers/teamMember/teamMember.route");
+const project = require("../controllers/project/project.router");
 
 const router = require("express").Router();
 
@@ -6,6 +7,10 @@ const defaultRoutes = [
     {
         path: "/team",
         handler: teamMember,
+    },
+    {
+        path: "/project",
+        handler: project,
     },
 ];
 
