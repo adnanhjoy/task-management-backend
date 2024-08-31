@@ -3,11 +3,11 @@ const { v4: uuidv4 } = require('uuid');
 
 const createProject = async (req, res) => {
     try {
-        const { name, color, status, teammembers } = req.body;
+        const { name, color, status } = req.body;  // Removed the extra comma here
         const id = uuidv4();
         const newProject = await pool.query(
-            "INSERT INTO project (id, name, color, status, teammembers) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-            [id, name, color, status, teammembers]
+            "INSERT INTO project (id, name, color, status) VALUES ($1, $2, $3, $4) RETURNING *",  // Removed the extra comma here
+            [id, name, color, status]  // Removed the extra comma here
         );
 
         res.status(200).json({
@@ -21,6 +21,7 @@ const createProject = async (req, res) => {
         });
     }
 };
+
 
 
 
@@ -71,11 +72,31 @@ const deleteProjet = async (req, res) => {
 const updateProjects = async (req, res) => {
     try {
         const { id } = req.params;
-        const {  name, color, status, teammembers } = req.body;
-        const updateProject = await pool.query(
-            "UPDATE project SET name = $2, color = $3, status = $4, teammembers = $5 WHERE id = $1 RETURNING *",
-            [id,  name, color, status, teammembers]
-        );
+        const { name, color, status } = req.body;
+
+        let fields = [];
+        let values = [id];
+        let index = 2;
+
+        if (name) {
+            fields.push(`name = $${index}`);
+            values.push(name);
+            index++;
+        }
+        if (color) {
+            fields.push(`color = $${index}`);
+            values.push(color);
+            index++;
+        }
+        if (status) {
+            fields.push(`status = $${index}`);
+            values.push(status);
+            index++;
+        }
+
+        const query = `UPDATE project SET ${fields.join(', ')} WHERE id = $1 RETURNING *`;
+
+        const updateProject = await pool.query(query, values);
 
         res.status(200).json({
             data: updateProject.rows
@@ -83,9 +104,10 @@ const updateProjects = async (req, res) => {
     } catch (error) {
         res.status(500).json({
             error: "There was a server side error"
-        })
+        });
     }
-}
+};
+
 
 
 
