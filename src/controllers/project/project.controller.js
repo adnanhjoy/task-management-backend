@@ -3,11 +3,11 @@ const { v4: uuidv4 } = require('uuid');
 
 const createProject = async (req, res) => {
     try {
-        const { name, color, status } = req.body;  // Removed the extra comma here
+        const { name, color, status } = req.body;
         const id = uuidv4();
         const newProject = await pool.query(
-            "INSERT INTO project (id, name, color, status) VALUES ($1, $2, $3, $4) RETURNING *",  // Removed the extra comma here
-            [id, name, color, status]  // Removed the extra comma here
+            "INSERT INTO project (id, name, color, status) VALUES ($1, $2, $3, $4) RETURNING *",
+            [id, name, color, status]
         );
 
         res.status(200).json({
@@ -110,10 +110,24 @@ const updateProjects = async (req, res) => {
 
 
 
+// relation team and projects 
+const teamProjects = async (req, res) => {
+    try {
+
+    } catch (error) {
+        res.status(500).json({
+            error: "There was a server side error"
+        });
+    }
+}
+
+
+
 
 module.exports = {
     createProject,
     getAllProject,
     deleteProjet,
-    updateProjects
+    updateProjects,
+    teamProjects
 }

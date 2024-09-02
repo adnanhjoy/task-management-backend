@@ -17,4 +17,8 @@ router.delete('/:id', projectController.deleteProjet);
 //update project
 router.put('/:id', projectController.updateProjects);
 
+
+//team and project
+router.post('/teamProject', projectController.teamProjects);
+
 module.exports = { projectRouter } = router
