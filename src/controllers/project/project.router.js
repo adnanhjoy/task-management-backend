@@ -10,6 +10,10 @@ router.post('/', projectController.createProject);
 router.get('/', projectController.getAllProject);
 
 
+//get single project
+router.get('/:id', projectController.getSingleProject);
+
+
 //delete project
 router.delete('/:id', projectController.deleteProjet);
 

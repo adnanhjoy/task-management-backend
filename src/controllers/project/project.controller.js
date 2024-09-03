@@ -44,6 +44,27 @@ const getAllProject = async (req, res) => {
     }
 }
 
+//get single project
+const getSingleProject = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const project = await pool.query(
+            "SELECT * FROM project WHERE id=$1",
+            [id]
+        )
+
+        res.status(200).json({
+            message: 'Success',
+            data: project.rows
+        })
+
+    } catch (error) {
+        res.status(500).json({
+            error: "There was a server side error"
+        })
+    }
+}
 
 
 //delete project
@@ -175,6 +196,7 @@ const getProjectWithTeamMembers = async (req, res) => {
 module.exports = {
     createProject,
     getAllProject,
+    getSingleProject,
     deleteProjet,
     updateProjects,
     assignTeamToProject,
