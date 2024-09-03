@@ -111,15 +111,63 @@ const updateProjects = async (req, res) => {
 
 
 // relation team and projects 
-const teamProjects = async (req, res) => {
+const assignTeamToProject = async (req, res) => {
     try {
+        const { projectId, teamMemberId } = req.body;
 
+        await pool.query(
+            "INSERT INTO project_teammembers (project_id, teammember_id) VALUES ($1, $2)",
+            [projectId, teamMemberId]
+        );
+
+        res.status(200).json({
+            message: "Team members successfully assigned to project"
+        });
     } catch (error) {
+        console.error(error);
         res.status(500).json({
             error: "There was a server side error"
         });
     }
-}
+};
+
+
+
+// get team members project
+const getProjectWithTeamMembers = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const project = await pool.query(
+            `SELECT * FROM project WHERE id = $1`,
+            [id]
+        );
+
+        if (project.rows.length === 0) {
+            return res.status(404).json({
+                error: "Project not found"
+            });
+        }
+
+        const teamMembers = await pool.query(
+            `SELECT tm.* FROM teammembers tm
+            INNER JOIN project_teammembers ptm ON tm.id = ptm.teammember_id
+            WHERE ptm.project_id = $1`,
+            [id]
+        );
+
+        res.status(200).json({
+            project: project.rows[0],
+            teamMembers: teamMembers.rows
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: "There was a server side error"
+        });
+    }
+};
+
 
 
 
@@ -129,5 +177,6 @@ module.exports = {
     getAllProject,
     deleteProjet,
     updateProjects,
-    teamProjects
+    assignTeamToProject,
+    getProjectWithTeamMembers
 }
