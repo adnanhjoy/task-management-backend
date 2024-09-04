@@ -29,4 +29,7 @@ router.post('/teamProject', projectController.assignTeamToProject);
 //team and project
 router.get('/:id/team-members', projectController.getProjectWithTeamMembers);
 
+
+router.get('/:id/members', projectController.getTeamMembersWithProjects);
+
 module.exports = { projectRouter } = router

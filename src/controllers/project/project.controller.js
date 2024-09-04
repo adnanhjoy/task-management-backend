@@ -191,6 +191,46 @@ const getProjectWithTeamMembers = async (req, res) => {
 
 
 
+// get team members with project 
+const getTeamMembersWithProjects = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+
+        const teamMember = await pool.query(
+            `SELECT * FROM teammembers WHERE id = $1`,
+            [id]
+        );
+
+        if (teamMember.rows.length === 0) {
+            return res.status(404).json({
+                error: "Team member not found"
+            });
+        }
+
+
+        const projects = await pool.query(
+            `SELECT p.* FROM project p
+            INNER JOIN project_teammembers ptm ON p.id = ptm.project_id
+            WHERE ptm.teammember_id = $1`,
+            [id]
+        );
+
+        res.status(200).json({
+            teamMember: teamMember.rows[0],
+            projects: projects.rows
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: "There was a server side error"
+        });
+    }
+};
+
+
+
+
 
 
 module.exports = {
@@ -200,5 +240,6 @@ module.exports = {
     deleteProjet,
     updateProjects,
     assignTeamToProject,
-    getProjectWithTeamMembers
+    getProjectWithTeamMembers,
+    getTeamMembersWithProjects
 }
